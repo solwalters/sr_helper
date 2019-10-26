@@ -1,27 +1,3 @@
-/* Character object architecture
-
-{
-    "attributes":{
-        "body": 0,
-        "agility": 0,
-        "reaction": 0,
-        "strength": 0,
-        "willpower": 0,
-        "logic": 0,
-        "intuition": 0,
-        "charisma": 0,
-        "edge": 0,
-        "essence": 0.0,
-        "magic": null,
-        "resonance": null
-    },
-    "skills":{
-        ""
-    }
-}
-
-*/
-
 function RollD6(){
     return Math.floor(Math.random() * ((6 - 1) + 1) + 1);
 }
@@ -32,6 +8,7 @@ function RollDicePool(pool){
     results.misses = 0;
     results.hits = 0;
     results.sixes = 0;
+    results.glitch = '';
 
     var singleRoll;
     for (var i = 0; i < pool; i++) {
@@ -48,19 +25,31 @@ function RollDicePool(pool){
         }
 
     }
+    if (results.misses >= pool/2){
+        if (results.hits == 0){
+            results.glitch += 'Critical ';       
+        }
+        results.glitch += 'Glitch!'
+    }
     return results;
 }
+
+
 
 function RollSingleDicePoolBtn(){
     document.getElementById("rollSingleDicePoolResults").innerHTML = '';
     var value = document.getElementById("rollSingleDicePoolValue").value;
-    if (!isNaN(value)){
-        var dicePool = RollDicePool(value);
-        var results = "DicePool: " + value + "<br/>Hits: " + dicePool.hits + "<br/>Misses: " + dicePool.misses;
-        document.getElementById("rollSingleDicePoolResults").innerHTML = results;
+    if (isNaN(value) || value == ''){
+        document.getElementById("rollSingleDicePoolResults").innerHTML = 'Not a numeric value.';   
     }
     else {
-        document.getElementById("rollSingleDicePoolResults").innerHTML = 'Not a numeric value.';   
+        var dicePool = RollDicePool(value);
+        console.log(dicePool);
+        var results = "DicePool: " + value + "<br/>Hits: " + dicePool.hits + "<br/>Misses: " + dicePool.misses;
+        if (dicePool.glitch != ''){
+            results += "<br/><b>" + dicePool.glitch + "</b>";
+        }
+        document.getElementById("rollSingleDicePoolResults").innerHTML = results;
     }
 }
 
