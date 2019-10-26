@@ -6,9 +6,18 @@
 </head>
 <body>
     <h1>Running the Shadows</h1>
+    <h3>Single Dice Pool</h3>
     <input type="text" id="rollSingleDicePoolValue">
     <button id="rollSingleDicePool" onclick="RollSingleDicePoolBtn()">Roll</button>
     <div id="rollSingleDicePoolResults"></div>
+    <br/>
+    <h3>Attack Roll</h3>
+    <label>Attacker Dice Pool: (attribute + skill)</label><input type="text" id="attackerDicePoolValue"><br/>
+    <label>Attacker Damage: (weapon)</label><input type="text" id="attackerDamageValue"><br/>
+    <label>Defender Dice Pool: (reaction + intuition)</label><input type="text" id="defenderDicePoolValue"><br/>
+    <label>Defender Soak: (armor + body)</label><input type="text" id="defenderSoakValue"><br/>
+    <button id="rollCombat" onclick="RollCombatBtn()">Roll</button>
+    <div id="rollCombatResults"></div>
     <br/>
 </body>
 </html>
