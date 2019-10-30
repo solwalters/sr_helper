@@ -4,6 +4,7 @@ function RollD6(){
 
 function RollDicePool(pool){
     var results = {};
+    results.dicePool = pool;
     results.resultRolls = [];
     results.misses = 0;
     results.hits = 0;
@@ -59,8 +60,19 @@ function RollCombatBtn(){
 
     var at_dp = document.getElementById("attackerDicePoolValue").value;
     var at_dm = document.getElementById("attackerDamageValue").value;
+    var at_dt = null;
+    if (document.querySelector('input[name="attackerDamageType"]:checked') != null) {
+        at_dt = document.querySelector('input[name="attackerDamageType"]:checked').value;
+    }
+    var at_ap = document.getElementById("attackerArmorPenetration").value;
+    var at_di = null;
+    if (document.querySelector('input[name="attackerAPDirection"]:checked') != null) {
+        at_di = document.querySelector('input[name="attackerAPDirection"]:checked').value;
+    }
+
     var de_dp = document.getElementById("defenderDicePoolValue").value;
-    var de_so = document.getElementById("defenderSoakValue").value;
+    var de_ar = document.getElementById("defenderArmorValue").value;
+    var de_bo = document.getElementById("defenderBodyValue").value;
 
     if (at_dp == '') {
         at_dp = 0;
@@ -68,59 +80,100 @@ function RollCombatBtn(){
     if (at_dm == '') {
         at_dm = 0;
     }
+    if (at_ap == '') {
+        at_ap = 0;
+    }
     if (de_dp == '') {
         de_dp = 0;
     }
-    if (de_so == '') {
-        de_so = 0;
+    if (de_ar == '') {
+        de_ar = 0;
+    }
+    if (de_bo == '') {
+        de_bo = 0;
     }
 
-    if (isNaN(at_dp) || isNaN(at_dm) || isNaN(de_dp) || isNaN(de_so)) {
+    if (isNaN(at_dp) || isNaN(at_dm) || isNaN(at_ap) ||
+            isNaN(de_dp) || isNaN(de_ar) || isNaN(de_bo)) {
         document.getElementById("rollCombatResults").innerHTML = 'Missing a numeric value.';
     }
+    else if (at_dt == null || at_di == null) {
+        document.getElementById("rollCombatResults").innerHTML = 'Select damage type and AP +/-';
+    }
     else {
-        var p_at_dp = RollDicePool(at_dp);
-        var p_de_dp = RollDicePool(de_dp);
-        var p_de_so = RollDicePool(de_so);
-
         var results = '';
-
+        
+        var attackerDicePool = RollDicePool(at_dp);
         results +=
-            "AttackerDicePool: " + at_dp +
-            "<br/>Hits: " + p_at_dp.hits +
-            "<br/>Misses: " + p_at_dp.misses;
-        if (p_at_dp.glitch != ''){
-            results += "<br/><b>Attacker: " + p_at_dp.glitch + "</b>";
+            "Attacker Dice Pool: " + attackerDicePool.dicePool +
+            "<br/>Hits: " + attackerDicePool.hits +
+            "<br/>Misses: " + attackerDicePool.misses;
+        if (attackerDicePool.glitch != ''){
+            results += "<br/><b>Attacker: " + attackerDicePool.glitch + "</b>";
         }
-        results +=
-            "<br/>DefenderDicePool: " + de_dp +
-            "<br/>Hits: " + p_de_dp.hits +
-            "<br/>Misses: " + p_de_dp.misses;
-        if (p_de_dp.glitch != ''){
-            results += "<br/><b>Defender: " + p_de_dp.glitch + "</b>";
-        }
+        results += "<br/>";
 
-        if (p_de_dp.hits >= p_at_dp.hits) {
-            results += "<br/><br/><b>Miss.</b>";
+        var defenderDicePool = RollDicePool(de_dp);
+        results +=
+            "<br/>Defender Dice Pool: " + defenderDicePool.dicePool +
+            "<br/>Hits: " + defenderDicePool.hits +
+            "<br/>Misses: " + defenderDicePool.misses;
+        if (defenderDicePool.glitch != ''){
+            results += "<br/><b>Defender: " + defenderDicePool.glitch + "</b>";
+        }
+        results += "<br/>";
+
+        if (attackerDicePool.hits == defenderDicePool.hits) {
+            results += "<br/><b>Grazing hit.</b> No damage, \
+                but contact (poison, shock, touch-only spells, etc) was made.";
+        }
+        else if (attackerDicePool.hits < defenderDicePool.hits) {
+            results += "<br/><b>Miss.</b>";
         }
         else {
-            var netHits = p_at_dp.hits - p_de_dp.hits
+            var netHits = attackerDicePool.hits - defenderDicePool.hits;
             var netDmg = Number(at_dm) + Number(netHits);
-            results += "<br/><br/><b>Hit. " + netHits +
-                " net hits</b> added to damage.<br/>Rolling soak vs " + netDmg;
-            results +=
-                "<br/>DefenderSoakPool: " + de_so +
-                "<br/>Hits: " + p_de_so.hits +
-                "<br/>Misses: " + p_de_so.misses;
-            if (p_de_so.glitch != '') {
-                results += "<br/><b>Defender: " + p_de_so.glitch + "</b>";
-            }
-            if (p_de_so.hits > netDmg) {
-                results += "<br/>No damage.";
+            results += "<br/><b>Hit.</b> " + netHits +
+                " net hits added to damage. Total damage is " + netDmg + "<br/>";
+
+            var netArmor = 0;
+            if (at_di == '+') {
+                netArmor = Number(at_ap) + Number(de_ar);
             }
             else {
-                var dmg = Number(netDmg) - Number(p_de_so.hits);
-                results += "<br>" + dmg + " damage.";
+                netArmor = Number(de_ar) - Number(at_ap);
+            }
+            results += "<br/>Applying AP value of " + at_di + at_ap +
+                ". Modified Armor Value is " + netArmor + ". ";
+
+            var damageType = 'Stun';
+            if (at_dt == 'P') {
+                if (netDmg >= netArmor) {
+                    damageType = "Physical";
+                }
+            }
+            results += "Damage is " + damageType + ". ";
+
+            if (netArmor < 0) {
+                netArmor = 0;
+                results += "Armor is penetrated or not present.";
+            }
+            var defenderSoakPool = RollDicePool(Number(de_bo) + netArmor)
+
+            results += "<br/>Rolling soak vs " + netDmg + " total damage.";
+            results +=
+                "<br/>Defender Soak Pool: " + defenderSoakPool.dicePool +
+                "<br/>Hits: " + defenderSoakPool.hits +
+                "<br/>Misses: " + defenderSoakPool.misses;
+            if (defenderSoakPool.glitch != '') {
+                results += "<br/><b>Defender: " + defenderSoakPool.glitch + "</b>";
+            }
+            if (defenderSoakPool.hits > netDmg) {
+                results += "<br/><b>No damage.</b>";
+            }
+            else {
+                var dmg = Number(netDmg) - Number(defenderSoakPool.hits);
+                results += "<br><b>" + dmg + " " + damageType + " damage.</b>";
             }
         }
 

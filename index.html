@@ -11,11 +11,18 @@
     <button id="rollSingleDicePool" onclick="RollSingleDicePoolBtn()">Roll</button>
     <div id="rollSingleDicePoolResults"></div>
     <br/>
+
     <h3>Attack Roll</h3>
-    <label>Attacker Dice Pool: (attribute + skill)</label><input type="text" id="attackerDicePoolValue"><br/>
-    <label>Attacker Damage: (weapon)</label><input type="text" id="attackerDamageValue"><br/>
-    <label>Defender Dice Pool: (reaction + intuition)</label><input type="text" id="defenderDicePoolValue"><br/>
-    <label>Defender Soak: (armor + body)</label><input type="text" id="defenderSoakValue"><br/>
+    <h5>Attacker</h5>
+    <label>Dice Pool: (attribute + skill +/- mods)</label><input type="text" id="attackerDicePoolValue"><br/>
+    <label>Damage Value: </label><input type="text" id="attackerDamageValue"><br/>
+    <label>Damage Type: </label><input type="radio" name="attackerDamageType" value="P">Physical <input type="radio" name="attackerDamageType" value="S">Stun<br/>
+    <label>AP +/-: </label><input type="radio" name="attackerAPDirection" value="+">+ <input type="radio" name="attackerAPDirection" value="-">-<br/>
+    <label>AP Value: </label><input type="text" id="attackerArmorPenetration"><br/>
+    <h5>Defender</h5>
+    <label>Dice Pool: (reaction + intuition +/- mods + interrupt)</label><input type="text" id="defenderDicePoolValue"><br/>
+    <label>Body: </label><input type="text" id="defenderBodyValue"><br/>
+    <label>Armor: </label><input type="text" id="defenderArmorValue"><br/>
     <button id="rollCombat" onclick="RollCombatBtn()">Roll</button>
     <div id="rollCombatResults"></div>
     <br/>
