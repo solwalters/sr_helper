@@ -1,0 +1,11 @@
+{
+    "name": "ShadowBot",
+    "version": "0.0.1",
+    "description": "A bot to help run Shadowrun 5th Edition",
+    "main": "bot.js",
+    "author": "Sol Walters",
+    "dependencies": {
+        "-": "0.0.1",
+        "discord.js": "^12.1.1"
+    }
+}

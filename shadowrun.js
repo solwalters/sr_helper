@@ -1,8 +1,8 @@
-function RollD6(){
+function _RollD6(){
     return Math.floor(Math.random() * ((6 - 1) + 1) + 1);
 }
 
-function RollDicePool(pool){
+function _RollDicePool(pool){
     var results = {};
     results.dicePool = pool;
     results.resultRolls = [];
@@ -17,7 +17,7 @@ function RollDicePool(pool){
 
     var singleRoll;
     for (var i = 0; i < pool; i++) {
-        singleRoll = RollD6();
+        singleRoll = _RollD6();
         results.resultRolls[i] = singleRoll;
         if (singleRoll == 1){
             results.misses += 1;
@@ -39,6 +39,18 @@ function RollDicePool(pool){
     return results;
 }
 
+function RollDicePool(pool){
+    var dicePool = _RollDicePool(pool);
+    return dicePool;
+}
+
+// --------- exports for Discord Bot
+if (typeof exports === "object"){
+    module.exports.RollDicePool = RollDicePool;
+}
+
+// ---------------------------------
+
 function RollSingleDicePoolBtn(){
     document.getElementById("rollSingleDicePoolResults").innerHTML = '';
     var value = document.getElementById("rollSingleDicePoolValue").value;
@@ -46,12 +58,12 @@ function RollSingleDicePoolBtn(){
         document.getElementById("rollSingleDicePoolResults").innerHTML = 'Not a numeric value.';   
     }
     else {
-        var dicePool = RollDicePool(value);
-        var results = "DicePool: " + value + "<br/>Hits: " + dicePool.hits + "<br/>Misses: " + dicePool.misses;
-        if (dicePool.glitch != ''){
-            results += "<br/><b>" + dicePool.glitch + "</b>";
+        var results = RollDicePool(value);
+        var print = "DicePool: " + value + "<br/>Hits: " + results.hits + "<br/>Misses: " + results.misses;
+        if (results.glitch != ''){
+            results += "<br/><b>" + results.glitch + "</b>";
         }
-        document.getElementById("rollSingleDicePoolResults").innerHTML = results;
+        document.getElementById("rollSingleDicePoolResults").innerHTML = print;
     }
 }
 
@@ -103,7 +115,7 @@ function RollCombatBtn(){
     else {
         var results = '';
         
-        var attackerDicePool = RollDicePool(at_dp);
+        var attackerDicePool = _RollDicePool(at_dp);
         results +=
             "Attacker Dice Pool: " + attackerDicePool.dicePool +
             "<br/>Hits: " + attackerDicePool.hits +
@@ -113,7 +125,7 @@ function RollCombatBtn(){
         }
         results += "<br/>";
 
-        var defenderDicePool = RollDicePool(de_dp);
+        var defenderDicePool = _RollDicePool(de_dp);
         results +=
             "<br/>Defender Dice Pool: " + defenderDicePool.dicePool +
             "<br/>Hits: " + defenderDicePool.hits +
@@ -158,7 +170,7 @@ function RollCombatBtn(){
                 netArmor = 0;
                 results += "Armor is penetrated or not present.";
             }
-            var defenderSoakPool = RollDicePool(Number(de_bo) + netArmor)
+            var defenderSoakPool = _RollDicePool(Number(de_bo) + netArmor)
 
             results += "<br/>Rolling soak vs " + netDmg + " total damage.";
             results +=
