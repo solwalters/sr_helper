@@ -47,6 +47,7 @@ function RollDicePool(pool){
 // --------- exports for Discord Bot
 if (typeof exports === "object"){
     module.exports.RollDicePool = RollDicePool;
+    module.exports.RollD6 = _RollD6;
 }
 
 // ---------------------------------
